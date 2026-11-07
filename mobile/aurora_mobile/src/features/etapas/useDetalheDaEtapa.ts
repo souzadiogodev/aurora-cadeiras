@@ -2,9 +2,10 @@ import { useCallback, useState } from 'react';
 
 import { useServicos } from '@/core/ServicosProvider';
 import { acoesDaEtapa } from '@/features/etapas/acoes';
+import { statusAposApontamento } from '@/features/etapas/pendencias';
 import type { EtapaNaTela, MaterialDaEtapa } from '@/features/etapas/tipos';
 import { useSync } from '@/features/sync/SyncProvider';
-import type { TipoDeApontamento } from '@/features/sync/tipos';
+import { rotuloDoApontamento, type TipoDeApontamento } from '@/features/sync/tipos';
 import type { Perfil } from '@/core/auth/tokenStore';
 import { vibrarAlerta, vibrarSucesso } from '@/shared/vibracao';
 import { useCarregamento } from '@/shared/useCarregamento';
@@ -27,7 +28,7 @@ export function mensagemDoApontamento(
   situacao: 'confirmado' | 'guardado' | 'rejeitado',
   motivo?: string | null,
 ): MensagemDoApontamento {
-  const acao = tipo === 'Inicio' ? 'Início' : 'Fim';
+  const acao = rotuloDoApontamento(tipo);
   if (situacao === 'confirmado') {
     return { tipo: 'sucesso', texto: `${acao} da etapa registrado e confirmado pelo servidor.` };
   }
@@ -104,7 +105,7 @@ export function useDetalheDaEtapa(etapaId: number, perfil: Perfil) {
     const atualizada = await etapas.obterEtapa(etapaId);
     if (atualizada) return atualizada;
     if (situacao === 'rejeitado') return anterior;
-    return { ...anterior, status: tipo === 'Inicio' ? 'EmAndamento' : 'Concluida', pendenteEnvio: false };
+    return { ...anterior, status: statusAposApontamento(tipo), pendenteEnvio: false };
   }
 
   return {

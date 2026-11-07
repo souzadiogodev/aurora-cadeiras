@@ -4,7 +4,7 @@ import { Alert, View } from 'react-native';
 import { useServicos } from '@/core/ServicosProvider';
 import { useSync } from '@/features/sync/SyncProvider';
 import type { ClientePendente } from '@/features/clientes/tipos';
-import type { ApontamentoPendente } from '@/features/sync/tipos';
+import { rotuloDoApontamento, type ApontamentoPendente } from '@/features/sync/tipos';
 import { Aviso, Botao, Cartao, EstadoVazio, Tela, Texto } from '@/shared/componentes';
 import { formatarDataEHora } from '@/shared/formatar';
 import { useCarregamento } from '@/shared/useCarregamento';
@@ -78,7 +78,7 @@ export function TelaDaFila() {
   function descartar(item: ApontamentoPendente): void {
     Alert.alert(
       'Descartar apontamento?',
-      `O ${item.tipo === 'Inicio' ? 'início' : 'fim'} da etapa em ${item.estacaoNome} (${item.numeroOp}) não será enviado. Isso não pode ser desfeito.`,
+      `O ${rotuloDoApontamento(item.tipo).toLowerCase()} da etapa em ${item.estacaoNome} (${item.numeroOp}) não será enviado. Isso não pode ser desfeito.`,
       [
         { text: 'Cancelar', style: 'cancel' },
         {
@@ -119,9 +119,9 @@ export function TelaDaFila() {
       {itens.map((item) => (
         <Cartao
           key={item.clientRequestId}
-          rotuloDeAcessibilidade={`${item.tipo === 'Inicio' ? 'Início' : 'Fim'} em ${item.estacaoNome}, ${item.numeroOp}. ${descreverEstado(item)}${item.mensagem ? `. ${item.mensagem}` : ''}`}
+          rotuloDeAcessibilidade={`${rotuloDoApontamento(item.tipo)} em ${item.estacaoNome}, ${item.numeroOp}. ${descreverEstado(item)}${item.mensagem ? `. ${item.mensagem}` : ''}`}
         >
-          <Texto negrito>{`${item.tipo === 'Inicio' ? 'Início' : 'Fim'} · ${item.estacaoNome}`}</Texto>
+          <Texto negrito>{`${rotuloDoApontamento(item.tipo)} · ${item.estacaoNome}`}</Texto>
           <Texto secundario tamanho="pequeno">{`${item.numeroOp} · ${formatarDataEHora(item.dataHoraCliente)}`}</Texto>
           <Texto negrito cor={item.estado === 'Rejeitado' ? cores.perigo : cores.texto}>{descreverEstado(item)}</Texto>
           {item.mensagem ? <Texto cor={cores.perigo}>{item.mensagem}</Texto> : null}

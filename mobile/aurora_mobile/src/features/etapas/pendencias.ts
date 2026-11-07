@@ -1,5 +1,10 @@
-import type { EtapaDaEstacao, EtapaNaTela } from '@/features/etapas/tipos';
-import type { ApontamentoPendente } from '@/features/sync/tipos';
+import type { EtapaDaEstacao, EtapaNaTela, StatusDaEtapa } from '@/features/etapas/tipos';
+import type { ApontamentoPendente, TipoDeApontamento } from '@/features/sync/tipos';
+
+/** O início deixa a etapa em andamento e o fim a conclui (o que o servidor fará ao receber o apontamento). */
+export function statusAposApontamento(tipo: TipoDeApontamento): StatusDaEtapa {
+  return tipo === 'Inicio' ? 'EmAndamento' : 'Concluida';
+}
 
 /**
  * Sobrepõe ao dado do servidor o que o operador já fez e ainda não foi enviado, para a tela refletir o toque na hora
@@ -18,9 +23,9 @@ export function aplicarPendencias(
   return etapas.map((etapa) => {
     const pendente = ultimoPorEtapa.get(etapa.etapaId);
     if (!pendente) return { ...etapa, pendenteEnvio: false };
-    return pendente.tipo === 'Inicio'
-      ? { ...etapa, status: 'EmAndamento', iniciadaEm: etapa.iniciadaEm ?? pendente.dataHoraCliente, pendenteEnvio: true }
-      : { ...etapa, status: 'Concluida', pendenteEnvio: true };
+    const status = statusAposApontamento(pendente.tipo);
+    const iniciadaEm = pendente.tipo === 'Inicio' ? (etapa.iniciadaEm ?? pendente.dataHoraCliente) : etapa.iniciadaEm;
+    return { ...etapa, status, iniciadaEm, pendenteEnvio: true };
   });
 }
 

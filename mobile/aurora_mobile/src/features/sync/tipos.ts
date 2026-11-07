@@ -1,5 +1,10 @@
 export type TipoDeApontamento = 'Inicio' | 'Fim';
 
+/** Como o tipo aparece para o operador: "Início" ou "Fim". */
+export function rotuloDoApontamento(tipo: TipoDeApontamento): string {
+  return tipo === 'Inicio' ? 'Início' : 'Fim';
+}
+
 /** Situação de um apontamento na fila local (docs/08 §5). */
 export type EstadoDoApontamento = 'Pendente' | 'Enviando' | 'Rejeitado';
 
