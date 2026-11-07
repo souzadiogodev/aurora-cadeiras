@@ -79,20 +79,34 @@ public class RoteiroTests(ApiFactory api)
     {
         using var admin = await api.ComoAdministradorAsync();
         var produto = await CriarProdutoAsync(admin);
-        (await SubstituirAsync(admin, produto.Id, 1, 2, 3)).AssertStatus(HttpStatusCode.OK);
+        (await SubstituirAsync(admin, produto.Id, 1, 2, 3, 5)).AssertStatus(HttpStatusCode.OK);
 
-        var resposta = await SubstituirAsync(admin, produto.Id, 3, 2);
+        var resposta = await SubstituirAsync(admin, produto.Id, 3, 2, 5);
 
         resposta.AssertStatus(HttpStatusCode.OK);
         var roteiro = (await resposta.Content.ReadFromJsonAsync<RoteiroDto>())!;
-        Assert.Equal([(1, 3), (2, 2)], roteiro.Etapas.Select(e => ((int)e.Sequencia, (int)e.EstacaoId)));
+        Assert.Equal([(1, 3), (2, 2), (3, 5)], roteiro.Etapas.Select(e => ((int)e.Sequencia, (int)e.EstacaoId)));
 
         await using var conexao = new SqlConnection(api.ConnectionString);
         await conexao.OpenAsync();
         await using var comando = conexao.CreateCommand();
         comando.CommandText = "SELECT COUNT(*) FROM dbo.RoteiroProduto WHERE ProdutoId = @id";
         comando.Parameters.AddWithValue("@id", produto.Id);
-        Assert.Equal(2, (int)(await comando.ExecuteScalarAsync())!);
+        Assert.Equal(3, (int)(await comando.ExecuteScalarAsync())!);
+    }
+
+    [Theory]
+    [InlineData(new byte[] { 1, 2 })]
+    [InlineData(new byte[] { 1, 5, 2 })]
+    public async Task Roteiro_que_nao_termina_na_Qualidade_devolve_422(byte[] estacoes)
+    {
+        using var gerente = await api.ComoAsync("GerenteProducao");
+        var produto = await CriarProdutoAsync(gerente);
+
+        var resposta = await SubstituirAsync(gerente, produto.Id, estacoes);
+
+        resposta.AssertStatus(HttpStatusCode.UnprocessableEntity);
+        Assert.Equal("ROTEIRO_SEM_QUALIDADE_NO_FIM", await resposta.CodigoAsync());
     }
 
     [Theory]

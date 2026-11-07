@@ -308,6 +308,24 @@ public class ProducaoTests(BancoFixture banco)
     }
 
     [Fact]
+    public async Task Etapa_em_andamento_de_pedido_cancelado_nao_pode_ser_finalizada_51005()
+    {
+        var c = NovoCenario();
+        var pedido = await c.CriarPedidoAsync(await c.CriarProdutoAsync(), 1);
+        var corte = await c.EtapaAsync(await c.OpDoPedidoAsync(pedido), Cenario.Corte);
+        await c.IniciarAsync(corte);
+        await Db.ExecutarAsync("EXEC dbo.sp_CancelarPedido @p", banco.Usuarios.Vendedor, ("@p", pedido));
+
+        var erro = await Db.ErroAsync(
+            "EXEC dbo.sp_FinalizarEtapa @e, @r, @d", banco.Usuarios.Operador,
+            ("@e", corte), ("@r", Guid.NewGuid()), ("@d", DateTime.UtcNow));
+
+        Assert.Equal(51005, erro);
+        Assert.Equal("EmAndamento", await Db.TextoAsync(
+            "SELECT Status FROM dbo.OrdemProducaoEtapa WHERE OrdemProducaoEtapaId = @e", null, ("@e", corte)));
+    }
+
+    [Fact]
     public async Task Cancelar_pedido_expedido_falha_51005()
     {
         var c = NovoCenario();

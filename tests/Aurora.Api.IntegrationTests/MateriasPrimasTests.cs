@@ -160,7 +160,7 @@ public class MateriasPrimasTests(ApiFactory api)
         var produto = (await (await admin.PostAsJsonAsync(
                 "/api/v1/produtos", new Aurora.Application.Produtos.ProdutoRequest(codigoDoProduto, "Produto da ficha", 1, 10m)))
             .Content.ReadFromJsonAsync<Aurora.Application.Produtos.ProdutoDto>())!;
-        (await admin.PutAsJsonAsync($"/api/v1/produtos/{produto.Id}/roteiro", new Aurora.Application.Roteiros.RoteiroRequest(new byte[] { 1 })))
+        (await admin.PutAsJsonAsync($"/api/v1/produtos/{produto.Id}/roteiro", new Aurora.Application.Roteiros.RoteiroRequest(new byte[] { 1, 5 })))
             .AssertStatus(HttpStatusCode.OK);
         (await admin.PutAsJsonAsync(
                 $"/api/v1/produtos/{produto.Id}/ficha-tecnica",

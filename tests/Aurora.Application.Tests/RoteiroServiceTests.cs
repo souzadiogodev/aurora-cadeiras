@@ -23,6 +23,7 @@ public class RoteiroServiceTests
         [
             Estacao(1, "Corte", 1, true),
             Estacao(2, "Montagem", 2, true),
+            Estacao(5, "Qualidade", 5, true),
             Estacao(6, "Expedicao", 6, false),
         ]);
         _roteiros.Setup(r => r.ListarPorProdutoAsync(7, default)).ReturnsAsync([]);
@@ -50,9 +51,9 @@ public class RoteiroServiceTests
             .Callback<int, IReadOnlyList<RoteiroProduto>, CancellationToken>((_, etapas, _) => gravado = etapas)
             .Returns(Task.CompletedTask);
 
-        await Servico().SubstituirAsync(7, new RoteiroRequest(new byte[] { 2, 1 }));
+        await Servico().SubstituirAsync(7, new RoteiroRequest(new byte[] { 2, 1, 5 }));
 
-        Assert.Equal([(2, 1), (1, 2)], gravado!.Select(e => ((int)e.EstacaoId, (int)e.Sequencia)));
+        Assert.Equal([(2, 1), (1, 2), (5, 3)], gravado!.Select(e => ((int)e.EstacaoId, (int)e.Sequencia)));
     }
 
     [Theory]
@@ -74,9 +75,21 @@ public class RoteiroServiceTests
         _fichas.Setup(r => r.ListarPorProdutoAsync(7, default)).ReturnsAsync([new FichaTecnicaItem(7, 1, 2, 1m)]);
 
         var erro = await Assert.ThrowsAsync<RegraDeNegocioException>(
-            () => Servico().SubstituirAsync(7, new RoteiroRequest(new byte[] { 1 })));
+            () => Servico().SubstituirAsync(7, new RoteiroRequest(new byte[] { 1, 5 })));
 
         Assert.Equal("ROTEIRO_INCOMPATIVEL_COM_FICHA", erro.Codigo);
+        _roteiros.Verify(r => r.SubstituirAsync(It.IsAny<int>(), It.IsAny<IReadOnlyList<RoteiroProduto>>(), default), Times.Never);
+    }
+
+    [Theory]
+    [InlineData(new byte[] { 1, 2 })]    // sem Qualidade: a OP nunca seria concluída
+    [InlineData(new byte[] { 1, 5, 2 })] // Qualidade no meio: a aprovação deixaria a Montagem por fazer
+    public async Task Roteiro_precisa_terminar_na_Qualidade(byte[] estacoes)
+    {
+        var erro = await Assert.ThrowsAsync<RegraDeNegocioException>(() => Servico().SubstituirAsync(7, new RoteiroRequest(estacoes)));
+
+        Assert.Equal("ROTEIRO_SEM_QUALIDADE_NO_FIM", erro.Codigo);
+        Assert.Equal(TipoErro.EntidadeNaoProcessavel, erro.Tipo);
         _roteiros.Verify(r => r.SubstituirAsync(It.IsAny<int>(), It.IsAny<IReadOnlyList<RoteiroProduto>>(), default), Times.Never);
     }
 

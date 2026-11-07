@@ -136,6 +136,21 @@ public class EtapaServiceTests
         _uow.Verify(u => u.SalvarAsync(default), Times.Never);
     }
 
+    [Theory]
+    [InlineData(StatusOrdemProducao.Cancelada)]
+    [InlineData(StatusOrdemProducao.Concluida)]
+    public async Task Perda_nao_e_aceita_quando_a_ordem_foi_cancelada_ou_concluida(StatusOrdemProducao statusOp)
+    {
+        // Cancelar o pedido cancela a OP, mas a etapa que estava em andamento continua assim
+        EtapaNoBanco(Etapa(StatusEtapa.EmAndamento) with { StatusOp = statusOp });
+
+        var erro = await Assert.ThrowsAsync<RegraDeNegocioException>(
+            () => Servico().RegistrarPerdaAsync(341, new PerdaRequest("Refugo", 1, "Motivo")));
+
+        Assert.Equal("STATUS_INVALIDO", erro.Codigo);
+        _uow.Verify(u => u.SalvarAsync(default), Times.Never);
+    }
+
     [Fact]
     public async Task Perda_maior_que_a_quantidade_da_ordem_e_rejeitada()
     {

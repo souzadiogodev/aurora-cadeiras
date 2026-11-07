@@ -53,6 +53,13 @@ public class EtapaService(
                 "STATUS_INVALIDO", "A perda só pode ser registrada em uma etapa em andamento.", TipoErro.Conflito);
         }
 
+        // Cancelar o pedido cancela a OP, mas a etapa que já estava em andamento continua assim
+        if (etapa.StatusOp is StatusOrdemProducao.Cancelada or StatusOrdemProducao.Concluida)
+        {
+            throw new RegraDeNegocioException(
+                "STATUS_INVALIDO", "A ordem de produção foi cancelada ou concluída e não aceita perdas.", TipoErro.Conflito);
+        }
+
         if (request.Quantidade > etapa.QuantidadeOp)
         {
             throw new RegraDeNegocioException(

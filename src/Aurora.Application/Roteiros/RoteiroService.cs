@@ -12,6 +12,9 @@ public class RoteiroService(
     IEstacaoRepository estacoes,
     IValidator<RoteiroRequest> validador)
 {
+    /// <summary>Nome da estação em que a OP termina pela inspeção (o mesmo que sp_RegistrarInspecao procura).</summary>
+    public const string NomeDaEstacaoDeQualidade = "Qualidade";
+
     public async Task<RoteiroDto> ObterAsync(int produtoId, CancellationToken ct = default)
     {
         await GarantirProdutoAsync(produtoId, ct);
@@ -34,6 +37,16 @@ public class RoteiroService(
             throw new RegraDeNegocioException(
                 "ESTACAO_INVALIDA",
                 $"A estação {invalida} não existe ou não gera etapa de produção.",
+                TipoErro.EntidadeNaoProcessavel);
+        }
+
+        // A OP só termina pela inspeção (RN06, RN07): sem a Qualidade no fim, o pedido nunca ficaria pronto, e com ela
+        // no meio a aprovação concluiria a OP com etapas por fazer. O nome é o mesmo que os procedures usam.
+        if (!cadastradas.TryGetValue(request.Estacoes[^1], out var ultima) || ultima.Nome != NomeDaEstacaoDeQualidade)
+        {
+            throw new RegraDeNegocioException(
+                "ROTEIRO_SEM_QUALIDADE_NO_FIM",
+                "O roteiro precisa terminar na estação de Qualidade: a ordem de produção só é concluída pela inspeção.",
                 TipoErro.EntidadeNaoProcessavel);
         }
 

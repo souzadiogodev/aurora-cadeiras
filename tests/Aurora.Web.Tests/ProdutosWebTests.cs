@@ -8,7 +8,7 @@ namespace Aurora.Web.Tests;
 public partial class ProdutosWebTests(CenarioDoPainel cenario)
 {
     /// <summary>Roteiro digitado no teste de posições: Qualidade (1), Corte (2) e Estofaria (3).</summary>
-    private static readonly string[] OrdemDoRoteiroDigitado = ["Qualidade", "Corte", "Estofaria"];
+    private static readonly string[] OrdemDoRoteiroDigitado = ["Estofaria", "Corte", "Qualidade"];
 
     private static readonly string[] NomesDasEstacoes = ["Corte", "Montagem da Estrutura", "Estofaria", "Montagem Final", "Qualidade"];
 
@@ -127,10 +127,10 @@ public partial class ProdutosWebTests(CenarioDoPainel cenario)
         var (id, nome) = await CriarProdutoAsync(gerente);
         var editor = Navegador.Decodificar(await gerente.PaginaAsync($"/Produtos/Roteiro/{id}"));
 
-        // Qualidade na posição 1 e Corte na 2: a ordem digitada vale, não a ordem da lista
+        // Estofaria na posição 1 e Corte na 2: a ordem digitada vale, não a ordem da lista (a Qualidade fecha o roteiro)
         var envio = await gerente.EnviarAsync(
             $"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}",
-            CamposDoRoteiro(nome, (5, true, "1"), (1, true, "2"), (3, true, "3")));
+            CamposDoRoteiro(nome, (3, true, "1"), (1, true, "2"), (5, true, "3")));
         var detalhes = Navegador.Decodificar(await gerente.PaginaAsync($"/Produtos/Detalhes/{id}"));
 
         Assert.All(NomesDasEstacoes, estacao => Assert.Contains(estacao, editor, StringComparison.Ordinal));
@@ -182,7 +182,7 @@ public partial class ProdutosWebTests(CenarioDoPainel cenario)
     {
         using var gerente = await cenario.EntrarComoAsync("GerenteProducao");
         var (id, nome) = await CriarProdutoAsync(gerente);
-        await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1"), (2, true, "2")));
+        await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1"), (2, true, "2"), (5, true, "3")));
         var editor = await gerente.PaginaAsync($"/Produtos/FichaTecnica/{id}");
         var madeira = IdDaMateriaPrimaDoSeed(editor);
 
@@ -203,7 +203,7 @@ public partial class ProdutosWebTests(CenarioDoPainel cenario)
     {
         using var gerente = await cenario.EntrarComoAsync("GerenteProducao");
         var (id, nome) = await CriarProdutoAsync(gerente);
-        await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1")));
+        await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1"), (5, true, "2")));
 
         var editor = await gerente.PaginaAsync($"/Produtos/FichaTecnica/{id}");
         using var script = await gerente.GetAsync("/js/linhas-dinamicas.js");
@@ -223,7 +223,7 @@ public partial class ProdutosWebTests(CenarioDoPainel cenario)
     {
         using var gerente = await cenario.EntrarComoAsync("GerenteProducao");
         var (id, nome) = await CriarProdutoAsync(gerente);
-        await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1"), (2, true, "2")));
+        await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1"), (2, true, "2"), (5, true, "3")));
         var madeira = IdDaMateriaPrimaDoSeed(await gerente.PaginaAsync($"/Produtos/FichaTecnica/{id}"));
         await gerente.EnviarAsync($"/Produtos/FichaTecnica/{id}", $"/Produtos/FichaTecnica/{id}", CamposDaFicha(nome, (madeira, 1, "1"), (madeira, 2, "2")));
 
@@ -241,7 +241,7 @@ public partial class ProdutosWebTests(CenarioDoPainel cenario)
     {
         using var gerente = await cenario.EntrarComoAsync("GerenteProducao");
         var (id, nome) = await CriarProdutoAsync(gerente);
-        await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1")));
+        await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1"), (5, true, "2")));
         var madeira = IdDaMateriaPrimaDoSeed(await gerente.PaginaAsync($"/Produtos/FichaTecnica/{id}"));
 
         var resposta = await gerente.EnviarAsync(
@@ -261,7 +261,7 @@ public partial class ProdutosWebTests(CenarioDoPainel cenario)
     {
         using var gerente = await cenario.EntrarComoAsync("GerenteProducao");
         var (id, nome) = await CriarProdutoAsync(gerente);
-        await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1")));
+        await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1"), (5, true, "2")));
         var madeira = IdDaMateriaPrimaDoSeed(await gerente.PaginaAsync($"/Produtos/FichaTecnica/{id}"));
 
         var resposta = await gerente.EnviarAsync(
@@ -278,11 +278,11 @@ public partial class ProdutosWebTests(CenarioDoPainel cenario)
     {
         using var gerente = await cenario.EntrarComoAsync("GerenteProducao");
         var (id, nome) = await CriarProdutoAsync(gerente);
-        await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1"), (2, true, "2")));
+        await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1"), (2, true, "2"), (5, true, "3")));
         var madeira = IdDaMateriaPrimaDoSeed(await gerente.PaginaAsync($"/Produtos/FichaTecnica/{id}"));
         await gerente.EnviarAsync($"/Produtos/FichaTecnica/{id}", $"/Produtos/FichaTecnica/{id}", CamposDaFicha(nome, (madeira, 2, "1")));
 
-        var resposta = await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1")));
+        var resposta = await gerente.EnviarAsync($"/Produtos/Roteiro/{id}", $"/Produtos/Roteiro/{id}", CamposDoRoteiro(nome, (1, true, "1"), (5, true, "2")));
 
         Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
         Assert.Contains("ajuste a ficha antes de retirá-la do roteiro", Navegador.Decodificar(await resposta.Content.ReadAsStringAsync()), StringComparison.Ordinal);
