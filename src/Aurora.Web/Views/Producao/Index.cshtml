@@ -44,7 +44,7 @@
                             <div>@ordem.ProdutoCodigo &times; @ordem.Quantidade</div>
                             <div class="small text-muted">Pedido @ordem.PedidoNumero</div>
                             <div class="small">
-                                @if (etapa.Status == "EmAndamento")
+                                @if (etapa.Status == SituacaoDaEtapa.EmAndamento)
                                 {
                                     <span>Em andamento há @Formatacao.Duracao(etapa.MinutosNaEtapa ?? 0)</span>
                                 }

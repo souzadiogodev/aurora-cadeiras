@@ -3,7 +3,7 @@
     ViewData["Title"] = "Pedidos";
     var podeCriar = User.IsInRole(Perfis.Administrador) || User.IsInRole(Perfis.Vendedor);
     var filtro = Model.Filtro;
-    string[] statusPossiveis = ["Aberto", "Confirmado", "EmProducao", "Pronto", "Expedido", "Cancelado"];
+    var statusPossiveis = SituacaoDoPedido.Todas;
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">

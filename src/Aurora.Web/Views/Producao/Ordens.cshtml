@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Ordens de produção";
     var filtro = Model.Filtro;
-    string[] situacoes = ["Planejada", "EmAndamento", "Concluida", "Cancelada"];
+    var situacoes = SituacaoDaOrdem.Todas;
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">

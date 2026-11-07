@@ -3,7 +3,7 @@
     ViewData["Title"] = "Compras";
     var podeCriar = User.IsInRole(Perfis.Almoxarife);
     var filtro = Model.Filtro;
-    string[] statusPossiveis = ["Solicitado", "Emitido", "ParcialmenteRecebido", "Recebido", "Cancelado"];
+    var statusPossiveis = SituacaoDaCompra.Todas;
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">

@@ -3,11 +3,11 @@
 @{
     var classe = Model switch
     {
-        "Solicitado" => "text-bg-secondary",
-        "Emitido" => "text-bg-primary",
-        "ParcialmenteRecebido" => "text-bg-info",
-        "Recebido" => "text-bg-success",
-        "Cancelado" => "text-bg-danger",
+        SituacaoDaCompra.Solicitado => "text-bg-secondary",
+        SituacaoDaCompra.Emitido => "text-bg-primary",
+        SituacaoDaCompra.ParcialmenteRecebido => "text-bg-info",
+        SituacaoDaCompra.Recebido => "text-bg-success",
+        SituacaoDaCompra.Cancelado => "text-bg-danger",
         _ => "text-bg-light",
     };
 }

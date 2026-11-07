@@ -14,7 +14,7 @@ public sealed record PedidoResposta(
     bool Atrasado,
     IReadOnlyList<PedidoItemResposta> Itens)
 {
-    public const string StatusAberto = "Aberto";
+    public const string StatusAberto = SituacaoDoPedido.Aberto;
 
     public bool PodeEditar => Status == StatusAberto;
 
@@ -22,5 +22,5 @@ public sealed record PedidoResposta(
     public bool PodeConfirmar => Status == StatusAberto;
 
     /// <summary>O cancelamento vale até a produção terminar (Aberto, Confirmado ou Em produção).</summary>
-    public bool PodeCancelar => Status is StatusAberto or "Confirmado" or "EmProducao";
+    public bool PodeCancelar => Status is SituacaoDoPedido.Aberto or SituacaoDoPedido.Confirmado or SituacaoDoPedido.EmProducao;
 }

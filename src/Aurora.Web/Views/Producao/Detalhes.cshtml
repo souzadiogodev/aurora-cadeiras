@@ -173,7 +173,7 @@
                             <tr>
                                 <td>@Formatacao.DataHora(inspecao.DataHora)</td>
                                 <td>
-                                    <span class="badge @(inspecao.Resultado == "Aprovada" ? "text-bg-success" : "text-bg-danger")">@(inspecao.Resultado == "Aprovada" ? "Aprovada" : "Reprovada")</span>
+                                    <span class="badge @(inspecao.Resultado == ResultadoDaInspecao.Aprovada ? "text-bg-success" : "text-bg-danger")">@(inspecao.Resultado == ResultadoDaInspecao.Aprovada ? "Aprovada" : "Reprovada")</span>
                                 </td>
                                 <td>@(inspecao.EstacaoRetrabalhoNome ?? "—")</td>
                                 <td>@(inspecao.Observacao ?? "—")</td>

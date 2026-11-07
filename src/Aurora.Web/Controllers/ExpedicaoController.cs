@@ -1,3 +1,4 @@
+using Aurora.Web.Api;
 using Aurora.Web.Api.Expedicoes;
 using Aurora.Web.Api.Pedidos;
 using Aurora.Web.Extensions;
@@ -12,7 +13,7 @@ namespace Aurora.Web.Controllers;
 [Authorize(Roles = Perfis.ConsultaDeExpedicoes)]
 public class ExpedicaoController(IPedidosApi pedidos, IExpedicoesApi expedicoes) : AuroraController
 {
-    private static readonly FiltroDePedidos SomenteProntos = new("Pronto", null, null, null, null);
+    private static readonly FiltroDePedidos SomenteProntos = new(SituacaoDoPedido.Pronto, null, null, null, null);
 
     [HttpGet]
     public async Task<IActionResult> Index(int page = 1, CancellationToken ct = default) =>
@@ -28,7 +29,7 @@ public class ExpedicaoController(IPedidosApi pedidos, IExpedicoesApi expedicoes)
     public async Task<IActionResult> Expedir(int id, CancellationToken ct)
     {
         var pedido = await pedidos.ObterAsync(id, ct);
-        if (pedido.Status != "Pronto")
+        if (pedido.Status != SituacaoDoPedido.Pronto)
         {
             AvisarAtencao($"O pedido {pedido.Numero} está {Formatacao.StatusDoPedido(pedido.Status).ToLowerInvariant()}: só pedido pronto pode ser expedido.");
             return RedirectToAction("Detalhes", "Pedidos", new { id });

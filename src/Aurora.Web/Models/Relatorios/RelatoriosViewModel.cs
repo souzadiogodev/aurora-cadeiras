@@ -1,4 +1,6 @@
+using Aurora.Web.Api;
 using Aurora.Web.Api.Relatorios;
+using Aurora.Web.Extensions;
 
 namespace Aurora.Web.Models.Relatorios;
 
@@ -13,14 +15,6 @@ public sealed record RelatoriosViewModel(IReadOnlyList<RelatorioDisponivelRespos
 
     /// <summary>Situações do filtro; por ora só o relatório de pedidos filtra por situação.</summary>
     public IReadOnlyList<SituacaoOpcao> Situacoes(string tipo) => tipo == "pedidos"
-        ?
-        [
-            new("Aberto", "Aberto"),
-            new("Confirmado", "Confirmado"),
-            new("EmProducao", "Em produção"),
-            new("Pronto", "Pronto"),
-            new("Expedido", "Expedido"),
-            new("Cancelado", "Cancelado"),
-        ]
+        ? SituacaoDoPedido.Todas.Select(s => new SituacaoOpcao(s, Formatacao.StatusDoPedido(s))).ToList()
         : [];
 }

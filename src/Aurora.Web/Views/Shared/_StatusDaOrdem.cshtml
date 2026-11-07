@@ -3,10 +3,10 @@
 @{
     var classe = Model switch
     {
-        "Planejada" or "Pendente" => "text-bg-secondary",
-        "EmAndamento" => "text-bg-info",
-        "Concluida" => "text-bg-success",
-        "Cancelada" => "text-bg-danger",
+        SituacaoDaOrdem.Planejada or SituacaoDaEtapa.Pendente => "text-bg-secondary",
+        SituacaoDaOrdem.EmAndamento => "text-bg-info",
+        SituacaoDaOrdem.Concluida => "text-bg-success",
+        SituacaoDaOrdem.Cancelada => "text-bg-danger",
         _ => "text-bg-light",
     };
 }

@@ -1,4 +1,5 @@
 using System.Globalization;
+using Aurora.Web.Api;
 
 namespace Aurora.Web.Extensions;
 
@@ -32,21 +33,21 @@ public static class Formatacao
     /// <summary>Nome do status do pedido como o usuário lê ("EmProducao" vira "Em produção").</summary>
     public static string StatusDoPedido(string status) => status switch
     {
-        "EmProducao" => "Em produção",
+        SituacaoDoPedido.EmProducao => "Em produção",
         _ => status,
     };
 
     public static string StatusDaOrdem(string status) => status switch
     {
-        "EmAndamento" => "Em andamento",
-        "Concluida" => "Concluída",
+        SituacaoDaOrdem.EmAndamento => "Em andamento",
+        SituacaoDaOrdem.Concluida => "Concluída",
         _ => status,
     };
 
     /// <summary>Status do pedido de compra como o usuário lê ("ParcialmenteRecebido" vira "Parcialmente recebido").</summary>
     public static string StatusDaCompra(string status) => status switch
     {
-        "ParcialmenteRecebido" => "Parcialmente recebido",
+        SituacaoDaCompra.ParcialmenteRecebido => "Parcialmente recebido",
         _ => status,
     };
 

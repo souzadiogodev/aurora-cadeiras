@@ -3,7 +3,7 @@
     var pedido = Model.Pedido;
     ViewData["Title"] = "Pedido " + pedido.Numero;
     var podeEscrever = User.IsInRole(Perfis.Administrador) || User.IsInRole(Perfis.Vendedor);
-    var podeExpedir = User.IsInRole(Perfis.Almoxarife) && pedido.Status == "Pronto";
+    var podeExpedir = User.IsInRole(Perfis.Almoxarife) && pedido.Status == SituacaoDoPedido.Pronto;
 }
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
@@ -113,7 +113,7 @@
         </div>
     </section>
 }
-else if (Model.Ordens is not null && pedido.Status is "Pronto")
+else if (Model.Ordens is not null && pedido.Status is SituacaoDoPedido.Pronto)
 {
     <p class="alert alert-info" role="status">O estoque de produto acabado atende este pedido: nenhuma ordem de produção foi necessária.</p>
 }

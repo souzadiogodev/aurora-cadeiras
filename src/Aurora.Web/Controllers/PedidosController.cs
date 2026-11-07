@@ -1,4 +1,5 @@
 using System.Globalization;
+using Aurora.Web.Api;
 using Aurora.Web.Api.Clientes;
 using Aurora.Web.Api.Pedidos;
 using Aurora.Web.Api.Producao;
@@ -66,7 +67,7 @@ public class PedidosController(IPedidosApi pedidos, IClientesApi clientes, IProd
             async () =>
             {
                 var confirmado = await pedidos.ConfirmarAsync(id, ct);
-                AvisarSucesso(confirmado.Status == "Pronto"
+                AvisarSucesso(confirmado.Status == SituacaoDoPedido.Pronto
                     ? $"Pedido {confirmado.Numero} confirmado: o estoque de produto acabado atende tudo e já está reservado."
                     : $"Pedido {confirmado.Numero} confirmado. As ordens de produção foram geradas.");
                 return RedirectToAction(nameof(Detalhes), new { id });
