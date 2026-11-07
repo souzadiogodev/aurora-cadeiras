@@ -1,4 +1,4 @@
-# 12 - Matriz de rastreabilidade dos requisitos
+# 13 - Matriz de rastreabilidade dos requisitos
 
 **Estado em 02/11/2026**, depois da fase 6. Liga cada requisito do `00-escopo.md` ao código e aos testes que o
 sustentam. Os testes citados são arquivos de `tests/` (xUnit) e de `mobile/aurora_mobile/tests` (Jest); a última
