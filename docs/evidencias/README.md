@@ -37,6 +37,19 @@ funcionalidade, a **tela** que o usuário vê e o **código** que a implementa.
 
 Sugestão: intercalar `E04-pedido-novo.png` com o controller, e a tela de detalhes/expedição com a view.
 
+## Código do app mobile
+
+| Arquivo | O que mostra |
+|---|---|
+| `E05-codigo-banco-local-sqlite.png` | Banco local SQLite no celular (exigência do professor de mobile): fila de apontamentos e cache |
+| `E05-codigo-fila-offline.png` | Gravação do apontamento na fila local antes de ir ao servidor |
+| `E05-codigo-apontar-etapa.png` | Iniciar/finalizar etapa: tenta o servidor e, sem rede, guarda no aparelho |
+| `E05-codigo-regras-da-etapa.png` | Quais botões a etapa mostra conforme o perfil e o status (RN05: aguarda a etapa anterior) |
+| `E05-codigo-tela-inspecao.png` | Tela de inspeção em React Native: aprovar ou reprovar escolhendo a estação de retrabalho (RN06) |
+| `E05-codigo-renovacao-token.png` | Renovação automática do login (token) quando ele vence |
+
+Sugestão: intercalar `E05-modo-offline.png` com a fila offline, e `mobile/25-inspetor-formulario-reprovar.png` com a tela de inspeção.
+
 ## Banco de dados
 
 `E07-diagrama-chen.png` é o diagrama completo em notação de Chen (25 tabelas). Para o texto, os recortes por módulo
