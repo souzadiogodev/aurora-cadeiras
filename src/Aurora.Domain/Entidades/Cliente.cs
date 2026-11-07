@@ -8,12 +8,7 @@ public class Cliente : EntidadeBase
 
     public Cliente(string nome, string cpfCnpj, string? email, string? telefone, string? cidade, string? uf)
     {
-        Nome = nome;
-        CpfCnpj = cpfCnpj;
-        Email = email;
-        Telefone = telefone;
-        Cidade = cidade;
-        Uf = uf;
+        Atualizar(nome, cpfCnpj, email, telefone, cidade, uf);
         Ativo = true;
     }
 

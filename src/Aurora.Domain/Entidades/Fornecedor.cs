@@ -8,11 +8,7 @@ public class Fornecedor : EntidadeBase
 
     public Fornecedor(string razaoSocial, string cnpj, string? email, string? telefone, bool comunidadeTradicional)
     {
-        RazaoSocial = razaoSocial;
-        Cnpj = cnpj;
-        Email = email;
-        Telefone = telefone;
-        ComunidadeTradicional = comunidadeTradicional;
+        Atualizar(razaoSocial, cnpj, email, telefone, comunidadeTradicional);
         Ativo = true;
     }
 

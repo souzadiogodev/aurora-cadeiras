@@ -42,7 +42,23 @@ public partial class ApontamentoService(
             return ResultadoDeSincronizacaoDto.Rejeitado(Guid.Empty, "VALIDACAO", "Item vazio no lote.");
         }
 
-        if (!EnumPorNome.TentarObter(item.Tipo, out TipoApontamento tipo))
+        if (MotivoDeRecusa(item, out var tipo) is ResultadoDeSincronizacaoDto recusa)
+        {
+            return recusa;
+        }
+
+        if (await producao.ApontamentoRegistradoAsync(item.ClientRequestId, ct))
+        {
+            return ResultadoDeSincronizacaoDto.JaProcessado(item.ClientRequestId);
+        }
+
+        return await AplicarAsync(item, tipo, ct);
+    }
+
+    /// <summary>Confere o item antes de tocar no banco; devolve a rejeição, ou nulo se o item pode ser aplicado.</summary>
+    private ResultadoDeSincronizacaoDto? MotivoDeRecusa(ApontamentoOfflineItem item, out TipoApontamento tipo)
+    {
+        if (!EnumPorNome.TentarObter(item.Tipo, out tipo))
         {
             return ResultadoDeSincronizacaoDto.Rejeitado(
                 item.ClientRequestId, "VALIDACAO", "O tipo do apontamento deve ser Inicio ou Fim.");
@@ -61,11 +77,12 @@ public partial class ApontamentoService(
                 item.ClientRequestId, "PERFIL_SEM_PERMISSAO", "Somente o operador finaliza etapas.");
         }
 
-        if (await producao.ApontamentoRegistradoAsync(item.ClientRequestId, ct))
-        {
-            return ResultadoDeSincronizacaoDto.JaProcessado(item.ClientRequestId);
-        }
+        return null;
+    }
 
+    /// <summary>Aplica pelo mesmo caminho do apontamento online; qualquer falha vira rejeição só deste item.</summary>
+    private async Task<ResultadoDeSincronizacaoDto> AplicarAsync(ApontamentoOfflineItem item, TipoApontamento tipo, CancellationToken ct)
+    {
         var apontamento = new ApontamentoRequest(item.ClientRequestId, item.DataHoraCliente);
         try
         {

@@ -1,4 +1,3 @@
-using Aurora.Application.Comum;
 using Aurora.Application.Abstracoes;
 using Aurora.Application.Expedicoes;
 using Aurora.Domain.Entidades;
@@ -28,17 +27,7 @@ public sealed class ExpedicaoRepository(AuroraDbContext db) : IExpedicaoReposito
             expedicoes = expedicoes.Where(x => db.Pedidos.Any(pd => pd.Id == x.PedidoId && pd.VendedorId == vendedorId));
         }
 
-        if (filtro.De is DateOnly de)
-        {
-            var inicio = DiaDeNegocio.InicioEmUtc(de);
-            expedicoes = expedicoes.Where(x => x.DataHora >= inicio);
-        }
-
-        if (filtro.Ate is DateOnly ate)
-        {
-            var fim = DiaDeNegocio.InicioEmUtc(ate.AddDays(1));
-            expedicoes = expedicoes.Where(x => x.DataHora < fim);
-        }
+        expedicoes = expedicoes.NoPeriodo(x => x.DataHora, filtro.De, filtro.Ate);
 
         var total = await expedicoes.CountAsync(ct);
         var itens = await Consultar(expedicoes).Skip((pagina - 1) * tamanho).Take(tamanho).ToListAsync(ct);

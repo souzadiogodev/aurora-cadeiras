@@ -1,5 +1,4 @@
-﻿using Aurora.Application.Comum;
-using Aurora.Application.Abstracoes;
+﻿using Aurora.Application.Abstracoes;
 using Aurora.Application.Estoque;
 using Aurora.Domain.Entidades;
 using Aurora.Domain.Enums;
@@ -183,17 +182,7 @@ public sealed class EstoqueRepository(AuroraDbContext db) : IEstoqueRepository
             consulta = consulta.Where(m => m.Origem == origem);
         }
 
-        if (filtro.De is DateOnly de)
-        {
-            var inicio = DiaDeNegocio.InicioEmUtc(de);
-            consulta = consulta.Where(m => m.DataHora >= inicio);
-        }
-
-        if (filtro.Ate is DateOnly ate)
-        {
-            var fim = DiaDeNegocio.InicioEmUtc(ate.AddDays(1));
-            consulta = consulta.Where(m => m.DataHora < fim);
-        }
+        consulta = consulta.NoPeriodo(m => m.DataHora, filtro.De, filtro.Ate);
 
         return consulta;
     }

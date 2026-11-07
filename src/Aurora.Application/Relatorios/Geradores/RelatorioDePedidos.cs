@@ -20,14 +20,7 @@ public sealed class RelatorioDePedidos(IRelatoriosRepository relatorios, ICurren
     public async Task<Relatorio> GerarAsync(FiltroDeRelatorio filtro, DateTime agoraUtc, CancellationToken ct = default)
     {
         FiltrosDeRelatorio.ValidarPeriodo(filtro.De, filtro.Ate);
-        StatusPedido? status = null;
-        if (!string.IsNullOrWhiteSpace(filtro.Status))
-        {
-            status = EnumPorNome.TentarObter(filtro.Status, out StatusPedido obtido)
-                ? obtido
-                : throw new RegraDeNegocioException(
-                    "FILTRO_INVALIDO", $"Situação desconhecida: {filtro.Status}.", TipoErro.Validacao);
-        }
+        var status = LerSituacao(filtro.Status);
 
         var somenteDoVendedor = usuarioAtual.Perfil == PerfilUsuario.Vendedor ? usuarioAtual.UsuarioId : null;
         var resultado = await relatorios.ListarPedidosAsync(
@@ -49,17 +42,7 @@ public sealed class RelatorioDePedidos(IRelatoriosRepository relatorios, ICurren
             ])
             .ToList();
 
-        var filtros = new List<string> { ConstantesDeRelatorio.Periodo(filtro.De, filtro.Ate) };
-        if (status is not null)
-        {
-            filtros.Add($"Situação: {RotulosDeSituacao.De(status.Value)}");
-        }
-
-        if (somenteDoVendedor is not null)
-        {
-            filtros.Add("Somente os seus pedidos");
-        }
-
+        var filtros = DescreverFiltros(filtro, status, somenteDoVendedor is not null);
         var secao = new SecaoDeRelatorio(
             "Pedidos",
             [
@@ -77,6 +60,35 @@ public sealed class RelatorioDePedidos(IRelatoriosRepository relatorios, ICurren
             Totais: ["Total", null, null, null, null, null, resultado.Itens.Sum(p => p.Itens), resultado.Itens.Sum(p => p.ValorTotal), null],
             Aviso: ConstantesDeRelatorio.AvisoDeCorte(resultado.Itens.Count, resultado.Total));
         return new Relatorio(Titulo, agoraUtc, filtros, [secao]);
+    }
+
+    private static StatusPedido? LerSituacao(string? situacao)
+    {
+        if (string.IsNullOrWhiteSpace(situacao))
+        {
+            return null;
+        }
+
+        return EnumPorNome.TentarObter(situacao, out StatusPedido status)
+            ? status
+            : throw new RegraDeNegocioException("FILTRO_INVALIDO", $"Situação desconhecida: {situacao}.", TipoErro.Validacao);
+    }
+
+    /// <summary>Os filtros aplicados, como aparecem no cabeçalho do relatório.</summary>
+    private static List<string> DescreverFiltros(FiltroDeRelatorio filtro, StatusPedido? status, bool somenteDoVendedor)
+    {
+        var filtros = new List<string> { ConstantesDeRelatorio.Periodo(filtro.De, filtro.Ate) };
+        if (status is not null)
+        {
+            filtros.Add($"Situação: {RotulosDeSituacao.De(status.Value)}");
+        }
+
+        if (somenteDoVendedor)
+        {
+            filtros.Add("Somente os seus pedidos");
+        }
+
+        return filtros;
     }
 
     /// <summary>Mesma regra da view vw_PedidosAtrasados: em andamento e com o prazo vencido.</summary>

@@ -1,4 +1,3 @@
-using Aurora.Application.Comum;
 using Aurora.Application.Abstracoes;
 using Aurora.Application.Qualidade;
 using Aurora.Domain.Entidades;
@@ -43,17 +42,7 @@ public sealed class QualidadeRepository(AuroraDbContext db) : IQualidadeReposito
             inspecoes = inspecoes.Where(i => i.Resultado == resultado);
         }
 
-        if (filtro.De is DateOnly de)
-        {
-            var inicio = DiaDeNegocio.InicioEmUtc(de);
-            inspecoes = inspecoes.Where(i => i.DataHora >= inicio);
-        }
-
-        if (filtro.Ate is DateOnly ate)
-        {
-            var fim = DiaDeNegocio.InicioEmUtc(ate.AddDays(1));
-            inspecoes = inspecoes.Where(i => i.DataHora < fim);
-        }
+        inspecoes = inspecoes.NoPeriodo(i => i.DataHora, filtro.De, filtro.Ate);
 
         var total = await inspecoes.CountAsync(ct);
         var itens = await Consultar(inspecoes).Skip((pagina - 1) * tamanho).Take(tamanho).ToListAsync(ct);

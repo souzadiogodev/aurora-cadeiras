@@ -21,7 +21,7 @@ public class ProdutoService(
     }
 
     public async Task<ProdutoDto> ObterAsync(int id, CancellationToken ct = default) =>
-        ProdutoDto.De(await ObterOuFalharAsync(id, ct));
+        ProdutoDto.De(await produtos.ObterOuFalharAsync(id, ct));
 
     public async Task<ProdutoDto> CriarAsync(ProdutoRequest request, CancellationToken ct = default)
     {
@@ -38,7 +38,7 @@ public class ProdutoService(
     public async Task<ProdutoDto> AtualizarAsync(int id, ProdutoRequest request, CancellationToken ct = default)
     {
         await validador.ValidateAndThrowAsync(request, ct);
-        var produto = await ObterOuFalharAsync(id, ct);
+        var produto = await produtos.ObterOuFalharAsync(id, ct);
         var codigo = Texto.NormalizarCodigo(request.Codigo);
         await GarantirCodigoDisponivelAsync(codigo, id, ct);
 
@@ -49,15 +49,12 @@ public class ProdutoService(
 
     public async Task<ProdutoDto> AlterarAtivoAsync(int id, bool ativo, CancellationToken ct = default)
     {
-        var produto = await ObterOuFalharAsync(id, ct);
+        var produto = await produtos.ObterOuFalharAsync(id, ct);
         produto.DefinirAtivo(ativo);
         await unitOfWork.SalvarAsync(ct);
         return ProdutoDto.De(produto);
     }
 
-    private async Task<Produto> ObterOuFalharAsync(int id, CancellationToken ct) =>
-        await produtos.ObterPorIdAsync(id, ct)
-        ?? throw new RegraDeNegocioException("PRODUTO_NAO_ENCONTRADO", "Produto não encontrado.", TipoErro.NaoEncontrado);
 
     private async Task GarantirCodigoDisponivelAsync(string codigo, int? ignorarId, CancellationToken ct)
     {

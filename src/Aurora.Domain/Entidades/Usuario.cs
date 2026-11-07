@@ -13,11 +13,8 @@ public class Usuario : EntidadeBase
 
     public Usuario(string nome, string email, string senhaHash, PerfilUsuario perfil, int? clienteId)
     {
-        Nome = nome;
-        Email = email;
         SenhaHash = senhaHash;
-        Perfil = perfil;
-        ClienteId = clienteId;
+        Atualizar(nome, email, perfil, clienteId);
         Ativo = true;
     }
 

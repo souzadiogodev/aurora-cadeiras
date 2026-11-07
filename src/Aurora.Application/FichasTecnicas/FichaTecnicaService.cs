@@ -1,4 +1,5 @@
 using Aurora.Application.Abstracoes;
+using Aurora.Application.Produtos;
 using Aurora.Domain.Entidades;
 using Aurora.Domain.Enums;
 using Aurora.Domain.Excecoes;
@@ -16,7 +17,7 @@ public class FichaTecnicaService(
 {
     public async Task<FichaTecnicaDto> ObterAsync(int produtoId, CancellationToken ct = default)
     {
-        await GarantirProdutoAsync(produtoId, ct);
+        await produtos.ObterOuFalharAsync(produtoId, ct);
         return await MontarAsync(produtoId, ct);
     }
 
@@ -24,7 +25,7 @@ public class FichaTecnicaService(
     public async Task<FichaTecnicaDto> SubstituirAsync(int produtoId, FichaTecnicaRequest request, CancellationToken ct = default)
     {
         await validador.ValidateAndThrowAsync(request, ct);
-        await GarantirProdutoAsync(produtoId, ct);
+        await produtos.ObterOuFalharAsync(produtoId, ct);
 
         var estacoesDoRoteiro = (await roteiros.ListarPorProdutoAsync(produtoId, ct)).Select(r => r.EstacaoId).ToHashSet();
         var foraDoRoteiro = request.Itens.Select(i => i.EstacaoId).FirstOrDefault(e => !estacoesDoRoteiro.Contains(e));
@@ -54,13 +55,6 @@ public class FichaTecnicaService(
         return await MontarAsync(produtoId, ct);
     }
 
-    private async Task GarantirProdutoAsync(int produtoId, CancellationToken ct)
-    {
-        if (await produtos.ObterPorIdAsync(produtoId, ct) is null)
-        {
-            throw new RegraDeNegocioException("PRODUTO_NAO_ENCONTRADO", "Produto não encontrado.", TipoErro.NaoEncontrado);
-        }
-    }
 
     private async Task<FichaTecnicaDto> MontarAsync(int produtoId, CancellationToken ct)
     {

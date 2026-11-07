@@ -1,4 +1,5 @@
 using Aurora.Application.Abstracoes;
+using Aurora.Application.Produtos;
 using Aurora.Domain.Entidades;
 using Aurora.Domain.Excecoes;
 using FluentValidation;
@@ -17,7 +18,7 @@ public class RoteiroService(
 
     public async Task<RoteiroDto> ObterAsync(int produtoId, CancellationToken ct = default)
     {
-        await GarantirProdutoAsync(produtoId, ct);
+        await produtos.ObterOuFalharAsync(produtoId, ct);
         return await MontarAsync(produtoId, ct);
     }
 
@@ -25,7 +26,7 @@ public class RoteiroService(
     public async Task<RoteiroDto> SubstituirAsync(int produtoId, RoteiroRequest request, CancellationToken ct = default)
     {
         await validador.ValidateAndThrowAsync(request, ct);
-        await GarantirProdutoAsync(produtoId, ct);
+        await produtos.ObterOuFalharAsync(produtoId, ct);
 
         var cadastradas = (await estacoes.ListarAsync(ct)).ToDictionary(e => e.Id);
         byte? invalida = request.Estacoes
@@ -68,13 +69,6 @@ public class RoteiroService(
         return await MontarAsync(produtoId, ct);
     }
 
-    private async Task GarantirProdutoAsync(int produtoId, CancellationToken ct)
-    {
-        if (await produtos.ObterPorIdAsync(produtoId, ct) is null)
-        {
-            throw new RegraDeNegocioException("PRODUTO_NAO_ENCONTRADO", "Produto não encontrado.", TipoErro.NaoEncontrado);
-        }
-    }
 
     private async Task<RoteiroDto> MontarAsync(int produtoId, CancellationToken ct)
     {

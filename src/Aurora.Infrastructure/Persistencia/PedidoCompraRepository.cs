@@ -1,5 +1,4 @@
-﻿using Aurora.Application.Comum;
-using Aurora.Application.Abstracoes;
+﻿using Aurora.Application.Abstracoes;
 using Aurora.Application.Compras;
 using Aurora.Domain.Entidades;
 using Aurora.Domain.Enums;
@@ -77,17 +76,7 @@ public sealed class PedidoCompraRepository(AuroraDbContext db) : IPedidoCompraRe
             consulta = consulta.Where(p => p.FornecedorId == fornecedorId);
         }
 
-        if (filtro.De is DateOnly de)
-        {
-            var inicio = DiaDeNegocio.InicioEmUtc(de);
-            consulta = consulta.Where(p => p.CriadoEm >= inicio);
-        }
-
-        if (filtro.Ate is DateOnly ate)
-        {
-            var fim = DiaDeNegocio.InicioEmUtc(ate.AddDays(1));
-            consulta = consulta.Where(p => p.CriadoEm < fim);
-        }
+        consulta = consulta.NoPeriodo(p => p.CriadoEm, filtro.De, filtro.Ate);
 
         if (filtro.Atrasados is bool atrasados)
         {

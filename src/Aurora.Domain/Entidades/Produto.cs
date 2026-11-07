@@ -10,10 +10,7 @@ public class Produto : EntidadeBase
 
     public Produto(string codigo, string nome, LinhaProduto linha, decimal precoVenda)
     {
-        Codigo = codigo;
-        Nome = nome;
-        Linha = linha;
-        PrecoVenda = precoVenda;
+        Atualizar(codigo, nome, linha, precoVenda);
         Ativo = true;
     }
 

@@ -1,4 +1,3 @@
-using Aurora.Application.Comum;
 using Aurora.Application.Abstracoes;
 using Aurora.Application.Pedidos;
 using Aurora.Domain.Entidades;
@@ -122,17 +121,7 @@ public sealed class PedidoRepository(AuroraDbContext db) : IPedidoRepository
             consulta = consulta.Where(p => p.ClienteId == clienteId);
         }
 
-        if (filtro.De is DateOnly de)
-        {
-            var inicio = DiaDeNegocio.InicioEmUtc(de);
-            consulta = consulta.Where(p => p.DataPedido >= inicio);
-        }
-
-        if (filtro.Ate is DateOnly ate)
-        {
-            var fim = DiaDeNegocio.InicioEmUtc(ate.AddDays(1));
-            consulta = consulta.Where(p => p.DataPedido < fim);
-        }
+        consulta = consulta.NoPeriodo(p => p.DataPedido, filtro.De, filtro.Ate);
 
         if (filtro.Atrasados is bool atrasados)
         {

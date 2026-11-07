@@ -1,4 +1,3 @@
-using Aurora.Application.Comum;
 using Aurora.Application.Abstracoes;
 using Aurora.Application.Painel;
 using Aurora.Application.Relatorios;
@@ -24,17 +23,7 @@ public sealed class RelatoriosRepository(AuroraDbContext db) : IRelatoriosReposi
             pedidos = pedidos.Where(p => p.Status == situacao);
         }
 
-        if (de is DateOnly inicio)
-        {
-            var desde = DiaDeNegocio.InicioEmUtc(inicio);
-            pedidos = pedidos.Where(p => p.DataPedido >= desde);
-        }
-
-        if (ate is DateOnly fim)
-        {
-            var ateOndeVale = DiaDeNegocio.InicioEmUtc(fim.AddDays(1));
-            pedidos = pedidos.Where(p => p.DataPedido < ateOndeVale);
-        }
+        pedidos = pedidos.NoPeriodo(p => p.DataPedido, de, ate);
 
         var total = await pedidos.CountAsync(ct);
         var itens = await (

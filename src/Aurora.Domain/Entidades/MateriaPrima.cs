@@ -11,12 +11,7 @@ public class MateriaPrima : EntidadeBase
     public MateriaPrima(
         string codigo, string nome, UnidadeDeMedida unidade, decimal estoqueMinimo, decimal custoUnitario, int? fornecedorPreferencialId)
     {
-        Codigo = codigo;
-        Nome = nome;
-        Unidade = unidade;
-        EstoqueMinimo = estoqueMinimo;
-        CustoUnitario = custoUnitario;
-        FornecedorPreferencialId = fornecedorPreferencialId;
+        Atualizar(codigo, nome, unidade, estoqueMinimo, custoUnitario, fornecedorPreferencialId);
         Ativo = true;
     }
 

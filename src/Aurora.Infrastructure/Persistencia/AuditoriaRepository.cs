@@ -1,4 +1,3 @@
-using Aurora.Application.Comum;
 using Aurora.Application.Abstracoes;
 using Aurora.Application.Auditoria;
 using Microsoft.EntityFrameworkCore;
@@ -27,17 +26,7 @@ public sealed class AuditoriaRepository(AuroraDbContext db) : IAuditoriaReposito
             linhas = linhas.Where(x => x.UsuarioId == usuarioId);
         }
 
-        if (filtro.De is DateOnly de)
-        {
-            var inicio = DiaDeNegocio.InicioEmUtc(de);
-            linhas = linhas.Where(x => x.DataHora >= inicio);
-        }
-
-        if (filtro.Ate is DateOnly ate)
-        {
-            var fim = DiaDeNegocio.InicioEmUtc(ate.AddDays(1));
-            linhas = linhas.Where(x => x.DataHora < fim);
-        }
+        linhas = linhas.NoPeriodo(x => x.DataHora, filtro.De, filtro.Ate);
 
         var total = await linhas.CountAsync(ct);
         var itens = await (
