@@ -89,7 +89,9 @@ public class AutenticacaoWebTests(CenarioDoPainel cenario)
         Assert.NotEqual("", cookie);
         Assert.Contains("httponly", cookie, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("samesite=strict", cookie, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("eyJ", cookie, StringComparison.Ordinal); // o JWT não aparece em claro no cookie
+        // O JWT não aparece em claro no cookie. Procura o formato do token (cabeçalho.conteúdo), e não só "eyJ": o cookie
+        // é criptografado e em base64, então "eyJ" pode surgir por acaso (falhava de vez em quando no CI).
+        Assert.DoesNotMatch(@"eyJ[\w-]+\.eyJ[\w-]+\.", cookie);
 
         var inicio = Navegador.Decodificar(await navegador.PaginaAsync("/"));
         Assert.Contains("Olá, Administrador", inicio, StringComparison.Ordinal);
