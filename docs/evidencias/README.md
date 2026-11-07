@@ -25,6 +25,18 @@ funcionalidade, a **tela** que o usuário vê e o **código** que a implementa.
 | 16 | Acessibilidade (RNF08) | `E04-lighthouse.png` | — |
 | 17 | Infraestrutura | `E08-docker-compose.png`, `E08-arquitetura-nuvem.png` | `E08-pipeline-cd.png` |
 
+## Código do painel web
+
+| Arquivo | O que mostra |
+|---|---|
+| `E04-codigo-web-controller-pedidos.png` | Controller MVC: confirmação do pedido em duas etapas (tela de confirmação e POST), com permissão por perfil |
+| `E04-codigo-web-view-detalhes-pedido.png` | View Razor: os botões aparecem conforme o perfil e a situação do pedido (só expede se Pronto) |
+| `E04-codigo-web-cliente-api.png` | O painel só fala com a API por HTTP; erros da API viram mensagens na tela |
+| `E04-codigo-web-renovacao-token.png` | Renovação automática do token JWT antes de expirar |
+| `E04-codigo-web-situacoes.png` | Situações do pedido, da OP e da compra num único lugar (sem textos espalhados) |
+
+Sugestão: intercalar `E04-pedido-novo.png` com o controller, e a tela de detalhes/expedição com a view.
+
 ## Banco de dados
 
 `E07-diagrama-chen.png` é o diagrama completo em notação de Chen (25 tabelas). Para o texto, os recortes por módulo
