@@ -1,3 +1,4 @@
+using Aurora.Application.Comum;
 using Aurora.Application.Abstracoes;
 using Aurora.Application.Painel;
 using Aurora.Application.Relatorios;
@@ -25,13 +26,13 @@ public sealed class RelatoriosRepository(AuroraDbContext db) : IRelatoriosReposi
 
         if (de is DateOnly inicio)
         {
-            var desde = inicio.ToDateTime(TimeOnly.MinValue);
+            var desde = DiaDeNegocio.InicioEmUtc(inicio);
             pedidos = pedidos.Where(p => p.DataPedido >= desde);
         }
 
         if (ate is DateOnly fim)
         {
-            var ateOndeVale = fim.AddDays(1).ToDateTime(TimeOnly.MinValue);
+            var ateOndeVale = DiaDeNegocio.InicioEmUtc(fim.AddDays(1));
             pedidos = pedidos.Where(p => p.DataPedido < ateOndeVale);
         }
 

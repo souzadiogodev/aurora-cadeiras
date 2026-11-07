@@ -25,7 +25,7 @@ internal sealed class CenarioDeProducao
     public const byte MontagemDaEstrutura = 2;
     public const byte Qualidade = 5;
 
-    private static readonly DateOnly Prazo = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(30);
+    private static readonly DateOnly Prazo = DiaDeNegocio.De(DateTime.UtcNow).AddDays(30);
 
     private readonly ApiFactory _api;
 

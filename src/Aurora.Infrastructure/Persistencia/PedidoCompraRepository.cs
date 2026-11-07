@@ -1,4 +1,5 @@
-﻿using Aurora.Application.Abstracoes;
+﻿using Aurora.Application.Comum;
+using Aurora.Application.Abstracoes;
 using Aurora.Application.Compras;
 using Aurora.Domain.Entidades;
 using Aurora.Domain.Enums;
@@ -78,13 +79,13 @@ public sealed class PedidoCompraRepository(AuroraDbContext db) : IPedidoCompraRe
 
         if (filtro.De is DateOnly de)
         {
-            var inicio = de.ToDateTime(TimeOnly.MinValue);
+            var inicio = DiaDeNegocio.InicioEmUtc(de);
             consulta = consulta.Where(p => p.CriadoEm >= inicio);
         }
 
         if (filtro.Ate is DateOnly ate)
         {
-            var fim = ate.AddDays(1).ToDateTime(TimeOnly.MinValue);
+            var fim = DiaDeNegocio.InicioEmUtc(ate.AddDays(1));
             consulta = consulta.Where(p => p.CriadoEm < fim);
         }
 

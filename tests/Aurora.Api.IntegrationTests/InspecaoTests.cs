@@ -272,7 +272,7 @@ public class InspecaoTests(ApiFactory api)
         await LerAsync(await InspecionarAsync(inspetor, antes.Ordem.Id, "Reprovada", CenarioDeProducao.MontagemDaEstrutura));
         await CenarioDeProducao.AvancarAteAQualidadeAsync(gerente, operador, pedido.Id);
         await LerAsync(await InspecionarAsync(inspetor, antes.Ordem.Id, "Aprovada"));
-        var hoje = DateOnly.FromDateTime(DateTime.UtcNow);
+        var hoje = DiaDeNegocio.De(DateTime.UtcNow);
         var rota = $"/api/v1/inspecoes?ordemProducaoId={antes.Ordem.Id}";
 
         var todas = await gerente.GetFromJsonAsync<Pagina<InspecaoDto>>(rota);

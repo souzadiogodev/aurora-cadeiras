@@ -1,3 +1,4 @@
+using Aurora.Application.Comum;
 using Aurora.Application.Abstracoes;
 using Aurora.Application.Expedicoes;
 using Aurora.Domain.Entidades;
@@ -29,13 +30,13 @@ public sealed class ExpedicaoRepository(AuroraDbContext db) : IExpedicaoReposito
 
         if (filtro.De is DateOnly de)
         {
-            var inicio = de.ToDateTime(TimeOnly.MinValue);
+            var inicio = DiaDeNegocio.InicioEmUtc(de);
             expedicoes = expedicoes.Where(x => x.DataHora >= inicio);
         }
 
         if (filtro.Ate is DateOnly ate)
         {
-            var fim = ate.AddDays(1).ToDateTime(TimeOnly.MinValue);
+            var fim = DiaDeNegocio.InicioEmUtc(ate.AddDays(1));
             expedicoes = expedicoes.Where(x => x.DataHora < fim);
         }
 

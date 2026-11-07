@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.RegularExpressions;
+using Aurora.Application.Comum;
 using Aurora.Application.Clientes;
 using Aurora.Application.Compras;
 using Aurora.Application.Fornecedores;
@@ -20,7 +21,7 @@ public sealed partial class RelatoriosTests(ApiFactory api)
     [GeneratedRegex(@"^attachment; filename=relatorio-[a-z-]+-\d{8}-\d{4}\.(pdf|xlsx)", RegexOptions.IgnoreCase)]
     private static partial Regex NomeDeArquivo();
 
-    private static DateOnly Hoje => DateOnly.FromDateTime(DateTime.UtcNow);
+    private static DateOnly Hoje => DiaDeNegocio.De(DateTime.UtcNow);
 
     private static async Task<HttpResponseMessage> PedirAsync(HttpClient cliente, string tipo, string formato, string extras = "") =>
         await cliente.GetAsync($"/api/v1/relatorios/{tipo}?formato={formato}{extras}");
@@ -317,11 +318,12 @@ public sealed partial class RelatoriosTests(ApiFactory api)
         (await almoxarife.PostAsJsonAsync($"/api/v1/pedidos-compra/itens/{pedido.Itens[0].Id}/receber", new ReceberItemRequest(100m)))
             .AssertStatus(HttpStatusCode.OK);
 
-        using var pasta = Excel(await BaixarAsync(gerente, "compras-comunitarias", "xlsx", $"&ano={DateTime.UtcNow.Year}"));
+        var agoraEmBrasilia = DateTime.UtcNow.Add(DiaDeNegocio.Deslocamento); // a view agrupa pelo mês de Brasília (010)
+        using var pasta = Excel(await BaixarAsync(gerente, "compras-comunitarias", "xlsx", $"&ano={agoraEmBrasilia.Year}"));
 
         var planilha = pasta.Worksheet("Recebimentos por mês");
-        var mes = System.Globalization.CultureInfo.GetCultureInfo("pt-BR").DateTimeFormat.GetMonthName(DateTime.UtcNow.Month);
-        var linha = planilha.RowsUsed().Single(r => r.Cell(1).GetString() == $"{mes} de {DateTime.UtcNow.Year}");
+        var mes = System.Globalization.CultureInfo.GetCultureInfo("pt-BR").DateTimeFormat.GetMonthName(agoraEmBrasilia.Month);
+        var linha = planilha.RowsUsed().Single(r => r.Cell(1).GetString() == $"{mes} de {agoraEmBrasilia.Year}");
         Assert.True(linha.Cell(2).GetValue<decimal>() >= 1250m); // 100 × 12,50 das comunidades
         Assert.True(linha.Cell(3).GetValue<decimal>() >= linha.Cell(2).GetValue<decimal>());
         Assert.InRange(linha.Cell(4).GetValue<decimal>(), 0.0001m, 1m); // o Excel guarda a fração (formato 0,00%)

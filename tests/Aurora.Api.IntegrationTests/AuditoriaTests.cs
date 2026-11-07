@@ -74,7 +74,7 @@ public sealed class AuditoriaTests(ApiFactory api)
         using var almoxarife = await api.ComoAsync("Almoxarife");
         using var admin = await api.ComoAdministradorAsync();
         var materia = await NovaMateriaAsync(almoxarife);
-        var hoje = DateOnly.FromDateTime(DateTime.UtcNow);
+        var hoje = DiaDeNegocio.De(DateTime.UtcNow);
         var autor = (await ConsultarAsync(admin, $"?tabela=MateriaPrima&registro={materia.Id}")).Items.Single().UsuarioId;
 
         var doAutor = await ConsultarAsync(admin, $"?tabela=MateriaPrima&registro={materia.Id}&usuarioId={autor}");

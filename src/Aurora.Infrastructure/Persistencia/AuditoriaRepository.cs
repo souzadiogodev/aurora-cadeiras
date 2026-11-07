@@ -1,3 +1,4 @@
+using Aurora.Application.Comum;
 using Aurora.Application.Abstracoes;
 using Aurora.Application.Auditoria;
 using Microsoft.EntityFrameworkCore;
@@ -28,13 +29,13 @@ public sealed class AuditoriaRepository(AuroraDbContext db) : IAuditoriaReposito
 
         if (filtro.De is DateOnly de)
         {
-            var inicio = de.ToDateTime(TimeOnly.MinValue);
+            var inicio = DiaDeNegocio.InicioEmUtc(de);
             linhas = linhas.Where(x => x.DataHora >= inicio);
         }
 
         if (filtro.Ate is DateOnly ate)
         {
-            var fim = ate.AddDays(1).ToDateTime(TimeOnly.MinValue);
+            var fim = DiaDeNegocio.InicioEmUtc(ate.AddDays(1));
             linhas = linhas.Where(x => x.DataHora < fim);
         }
 

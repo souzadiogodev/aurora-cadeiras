@@ -174,7 +174,7 @@ public class ExpedicaoTests(ApiFactory api)
         using var almoxarife = await api.ComoAsync("Almoxarife");
         var pedido = await PedidoProntoAsync(cenario, vendedor, quantidade: 1);
         (await almoxarife.PostAsync($"/api/v1/pedidos/{pedido.Id}/expedir", content: null)).AssertStatus(HttpStatusCode.Created);
-        var hoje = DateOnly.FromDateTime(DateTime.UtcNow);
+        var hoje = DiaDeNegocio.De(DateTime.UtcNow);
 
         var futuras = await almoxarife.GetFromJsonAsync<Pagina<ExpedicaoDto>>($"/api/v1/expedicoes?de={hoje.AddDays(2):yyyy-MM-dd}");
         var deHoje = await almoxarife.GetFromJsonAsync<Pagina<ExpedicaoDto>>(

@@ -36,6 +36,30 @@ public class EstoqueTests(ApiFactory api)
     }
 
     [Fact]
+    public async Task Filtro_por_data_usa_o_dia_de_Brasilia_e_um_movimento_as_22h_fica_no_proprio_dia()
+    {
+        using var almoxarife = await api.ComoAsync("Almoxarife");
+        var materia = await NovaMateriaPrimaAsync(almoxarife);
+        // 01:00 UTC de 04/11 = 22:00 de 03/11 em Brasília
+        await using (var conexao = new SqlConnection(api.ConnectionString))
+        {
+            await conexao.OpenAsync();
+            await using var comando = conexao.CreateCommand();
+            comando.CommandText =
+                "INSERT dbo.MovimentoEstoque (MateriaPrimaId, Tipo, Quantidade, Origem, Motivo, DataHora) " +
+                "VALUES (@id, 'Entrada', 1, 'Ajuste', N'Teste de fuso', '2026-11-04T01:00:00')";
+            comando.Parameters.AddWithValue("@id", materia.Id);
+            await comando.ExecuteNonQueryAsync();
+        }
+
+        var dia3 = await MovimentosAsync(almoxarife, $"materiaPrimaId={materia.Id}&de=2026-11-03&ate=2026-11-03");
+        var dia4 = await MovimentosAsync(almoxarife, $"materiaPrimaId={materia.Id}&de=2026-11-04&ate=2026-11-04");
+
+        Assert.Single(dia3!.Items);
+        Assert.Empty(dia4!.Items);
+    }
+
+    [Fact]
     public async Task Ajustar_atualiza_o_saldo_e_registra_a_diferenca_como_movimento_de_ajuste()
     {
         using var almoxarife = await api.ComoAsync("Almoxarife");
@@ -136,7 +160,7 @@ public class EstoqueTests(ApiFactory api)
         (await AjustarAsync(almoxarife, materia.Id, 10m)).AssertStatus(HttpStatusCode.OK);
         (await AjustarAsync(almoxarife, materia.Id, 4m)).AssertStatus(HttpStatusCode.OK);
         (await AjustarAsync(almoxarife, outra.Id, 99m)).AssertStatus(HttpStatusCode.OK);
-        var hoje = DateOnly.FromDateTime(DateTime.UtcNow);
+        var hoje = DiaDeNegocio.De(DateTime.UtcNow);
 
         var daMateria = await MovimentosAsync(almoxarife, $"materiaPrimaId={materia.Id}");
         var ajustes = await MovimentosAsync(almoxarife, $"materiaPrimaId={materia.Id}&tipo=Ajuste&origem=Ajuste");

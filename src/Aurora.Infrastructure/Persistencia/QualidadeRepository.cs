@@ -1,3 +1,4 @@
+using Aurora.Application.Comum;
 using Aurora.Application.Abstracoes;
 using Aurora.Application.Qualidade;
 using Aurora.Domain.Entidades;
@@ -44,13 +45,13 @@ public sealed class QualidadeRepository(AuroraDbContext db) : IQualidadeReposito
 
         if (filtro.De is DateOnly de)
         {
-            var inicio = de.ToDateTime(TimeOnly.MinValue);
+            var inicio = DiaDeNegocio.InicioEmUtc(de);
             inspecoes = inspecoes.Where(i => i.DataHora >= inicio);
         }
 
         if (filtro.Ate is DateOnly ate)
         {
-            var fim = ate.AddDays(1).ToDateTime(TimeOnly.MinValue);
+            var fim = DiaDeNegocio.InicioEmUtc(ate.AddDays(1));
             inspecoes = inspecoes.Where(i => i.DataHora < fim);
         }
 

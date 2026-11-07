@@ -497,7 +497,7 @@ public sealed partial class ProducaoTests(ApiFactory api)
     {
         var resposta = await vendedor.PostAsJsonAsync(
             "/api/v1/pedidos",
-            new PedidoRequest(cenario.Cliente.Id, DateOnly.FromDateTime(DateTime.UtcNow).AddDays(30), null, [new PedidoItemRequest(produtoId, 1)]));
+            new PedidoRequest(cenario.Cliente.Id, DiaDeNegocio.De(DateTime.UtcNow).AddDays(30), null, [new PedidoItemRequest(produtoId, 1)]));
         resposta.AssertStatus(HttpStatusCode.Created);
         return (await resposta.Content.ReadFromJsonAsync<PedidoDto>())!;
     }

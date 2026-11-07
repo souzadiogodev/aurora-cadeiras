@@ -13,7 +13,7 @@ namespace Aurora.Api.IntegrationTests;
 [Collection("api")]
 public sealed partial class PedidosTests(ApiFactory api)
 {
-    private static readonly DateOnly Prazo = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(30);
+    private static readonly DateOnly Prazo = DiaDeNegocio.De(DateTime.UtcNow).AddDays(30);
 
     [GeneratedRegex(@"^PV-\d{4}-\d{5}$")]
     private static partial Regex FormatoDoNumero();
@@ -133,7 +133,7 @@ public sealed partial class PedidosTests(ApiFactory api)
         var cliente = await NovoClienteAsync(admin);
         var produto = (await ProdutosDoSeedAsync(admin))[0];
         var item = new PedidoItemRequest(produto.Id, 1);
-        var ontem = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-5);
+        var ontem = DiaDeNegocio.De(DateTime.UtcNow).AddDays(-5);
 
         var invalidos = new[]
         {
@@ -312,7 +312,7 @@ public sealed partial class PedidosTests(ApiFactory api)
             await comando.ExecuteNonQueryAsync();
         }
 
-        var hoje = DateOnly.FromDateTime(DateTime.UtcNow);
+        var hoje = DiaDeNegocio.De(DateTime.UtcNow);
         var todos = await admin.GetFromJsonAsync<Pagina<PedidoResumoDto>>($"/api/v1/pedidos?clienteId={cliente.Id}");
         var abertos = await admin.GetFromJsonAsync<Pagina<PedidoResumoDto>>($"/api/v1/pedidos?clienteId={cliente.Id}&status=Aberto");
         var atrasados = await admin.GetFromJsonAsync<Pagina<PedidoResumoDto>>($"/api/v1/pedidos?clienteId={cliente.Id}&atrasados=true");

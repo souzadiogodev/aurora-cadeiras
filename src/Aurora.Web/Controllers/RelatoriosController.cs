@@ -11,9 +11,12 @@ namespace Aurora.Web.Controllers;
 [Authorize(Roles = Perfis.ConsultaDeRelatorios)]
 public class RelatoriosController(IRelatoriosApi relatorios, TimeProvider relogio) : AuroraController
 {
+    /// <summary>Brasília (UTC-3), como o dia de negócio da API: na noite de 31/12 o ano padrão ainda é o que está acabando.</summary>
+    private static readonly TimeSpan DeslocamentoDeBrasilia = TimeSpan.FromHours(-3);
+
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken ct) =>
-        View(new RelatoriosViewModel(await relatorios.ListarAsync(ct), relogio.GetUtcNow().Year));
+        View(new RelatoriosViewModel(await relatorios.ListarAsync(ct), relogio.GetUtcNow().ToOffset(DeslocamentoDeBrasilia).Year));
 
     /// <summary>Baixa o arquivo gerado. Um filtro recusado pela API (ex.: data inicial depois da final) volta à lista com o aviso.</summary>
     [HttpGet]

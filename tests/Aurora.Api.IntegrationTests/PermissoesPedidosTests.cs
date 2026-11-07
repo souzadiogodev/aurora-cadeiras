@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Aurora.Application.Comum;
 using Aurora.Application.Clientes;
 using Aurora.Application.Pedidos;
 using Aurora.Application.Produtos;
@@ -34,7 +35,7 @@ public class PermissoesPedidosTests(ApiFactory api)
                 "/api/v1/clientes", new ClienteRequest("Cliente", DadosDeTeste.Digitos(11), null, null, null, null)))
             .Content.ReadFromJsonAsync<ClienteDto>())!;
         var produtos = (await admin.GetFromJsonAsync<Aurora.Application.Comum.Pagina<ProdutoDto>>("/api/v1/produtos?busca=CE-100"))!;
-        var prazo = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(20);
+        var prazo = DiaDeNegocio.De(DateTime.UtcNow).AddDays(20);
         return new PedidoRequest(cliente.Id, prazo, null, [new PedidoItemRequest(produtos.Items.Single(p => p.Codigo == "CE-100").Id, 1)]);
     }
 
