@@ -35,6 +35,17 @@ public class InfraestruturaTests(ApiFactory api)
     }
 
     [Fact]
+    public async Task Interface_do_Swagger_abre_sem_login_quando_habilitada()
+    {
+        using var cliente = api.CreateClient();
+
+        var resposta = await cliente.GetAsync("/swagger/index.html");
+
+        resposta.AssertStatus(HttpStatusCode.OK);
+        Assert.Contains("swagger-ui", await resposta.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task Respostas_trazem_cabecalhos_de_seguranca_e_nao_expoem_o_servidor()
     {
         using var cliente = api.CreateClient();

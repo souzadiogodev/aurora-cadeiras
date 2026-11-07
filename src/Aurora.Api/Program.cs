@@ -43,10 +43,12 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseRateLimiter();
+
+// Antes da autenticação: a interface do Swagger é servida por middleware e cairia na política padrão (exigir login)
+app.UseAuroraSwagger();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseAuroraSwagger();
 app.MapControllers();
 app.MapAuroraHealth();
 

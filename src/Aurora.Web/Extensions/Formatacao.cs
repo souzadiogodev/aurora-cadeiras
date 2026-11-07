@@ -87,7 +87,8 @@ public static class Formatacao
 
     public static string Data(DateOnly data) => data.ToString("dd/MM/yyyy", PtBr);
 
-    public static string DataHora(DateTime dataHoraUtc) => dataHoraUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm", PtBr);
+    /// <summary>Horário UTC da API mostrado no horário de Brasília.</summary>
+    public static string DataHora(DateTime dataHoraUtc) => HorarioDeBrasilia.De(dataHoraUtc).ToString("dd/MM/yyyy HH:mm", PtBr);
 
     /// <summary>CPF (000.000.000-00) ou CNPJ (00.000.000/0000-00) a partir dos dígitos; outro tamanho volta como veio.</summary>
     public static string Documento(string? digitos) => digitos?.Length switch

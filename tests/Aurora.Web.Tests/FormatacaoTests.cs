@@ -127,4 +127,20 @@ public class FormatacaoTests
 
         Assert.DoesNotContain("\" onload=", svg, StringComparison.Ordinal);
     }
+
+    [Theory]
+    [InlineData(DateTimeKind.Utc)]
+    [InlineData(DateTimeKind.Unspecified)] // como o JSON da API chega quando a data vem sem o "Z"
+    public void Data_e_hora_da_API_aparece_no_horario_de_Brasilia_qualquer_que_seja_o_fuso_do_servidor(DateTimeKind tipo)
+    {
+        var utc = new DateTime(2026, 11, 7, 21, 27, 0, tipo); // 18:27 em Brasília
+
+        Assert.Equal("07/11/2026 18:27", Formatacao.DataHora(utc));
+    }
+
+    [Fact]
+    public void Virada_do_dia_em_UTC_ainda_e_o_dia_anterior_em_Brasilia()
+    {
+        Assert.Equal("07/11/2026 22:30", Formatacao.DataHora(new DateTime(2026, 11, 8, 1, 30, 0, DateTimeKind.Utc)));
+    }
 }
