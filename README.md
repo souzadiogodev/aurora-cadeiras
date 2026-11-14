@@ -17,7 +17,16 @@ A especificação está em [`docs/`](docs/README.md); o contexto para o Claude C
 | 2a API da fase 2 (clientes, fornecedores, ficha técnica, roteiro, estações, pedidos, movimentos e ajuste de estoque) | Concluída |
 | 2b Painel web (login por cookie, layout acessível, cadastros, produtos com ficha técnica e roteiro, pedidos) | Concluída |
 | 3 Produção e estoque (confirmar pedido, OPs e etapas com baixa de estoque, perdas, alertas, quadro de produção, etiqueta com QR code, saldos e movimentos) | Concluída, 761 testes no total |
-| 4 a 6 | A fazer (ver `docs/10-plano-implementacao.md`) |
+| 4a API do chão de fábrica (QR, fila da estação, sincronização offline, inspeção, expedição, acompanhamento) | Concluída |
+| 4b App mobile (login, etapas, QR, apontamento offline, perda, inspeção, estoque, pedidos, cadastro de cliente offline) | Concluída, testado no emulador Android |
+| 5a Compras (pedidos de compra, emissão, cancelamento e recebimento por item) | Concluída |
+| 5b Painel gerencial e relatórios em PDF e Excel | Concluída |
+| 5c Telas web de compras, expedição, painel e relatórios | Concluída |
+| 6a Auditoria (histórico de alterações na API e tela do administrador) | Concluída |
+| 6b Acessibilidade (axe e Lighthouse 100 nas telas do painel) | Concluída |
+| 6c Nuvem (Bicep, workflows de deploy e infra, telemetria) | Concluída; validada offline, ainda não aplicada no Azure |
+
+Total: 1.359 testes .NET e 242 testes do app, todos verdes.
 
 ## Estrutura
 
@@ -30,11 +39,13 @@ A especificação está em [`docs/`](docs/README.md); o contexto para o Claude C
 | `src/Aurora.Web` | Painel administrativo ASP.NET Core MVC (cliente tipado da API em `Api/`, sessão em cookie, telas por módulo) |
 | `src/Aurora.DbUp` | Runner que aplica os scripts de `database/` (usado pelo Docker e por qualquer ambiente) |
 | `tests/` | Domain, Application, Api (integração), Database (procedures e triggers) e Tests.Common (SQL Server de teste) |
-| `database/` | Scripts SQL numerados `001` a `007` (schema, views, procedures, triggers, segurança, seed e a correção da idempotência concorrente) |
+| `database/` | Scripts SQL numerados `001` a `011` (schema, views, procedures, triggers, segurança, seed e as correções posteriores: idempotência, dia de negócio, revisão das regras) |
 | `docker/` | Dockerfiles (api, web, dbup) e `docker-compose.yml` |
-| `.github/workflows/` | CI (`ci.yml`) e análise estática (`codeql.yml`) |
-| `infra/` | Bicep (fase 6) |
-| `mobile/aurora_mobile` | App mobile React Native (Expo + TypeScript), fora da solução .NET |
+| `.github/workflows/` | CI (`ci.yml`), análise estática (`codeql.yml`), infraestrutura (`infra.yml`) e deploy (`deploy.yml`, `implantar.yml`) |
+| `infra/` | Bicep do Azure (ACR, Container Apps, SQL, Key Vault, Storage, monitoramento); ver [`infra/README.md`](infra/README.md) |
+| `mobile/aurora_mobile` | App mobile React Native (Expo + TypeScript, SQLite local), fora da solução .NET; ver [`README`](mobile/aurora_mobile/README.md) |
+| `tools/acessibilidade` | Auditoria automática de acessibilidade do painel (axe e Lighthouse) |
+| `docs/evidencias/` | Prints e diagramas usados no relatório |
 
 ## Comandos
 
@@ -68,7 +79,7 @@ ConnectionStrings__Aurora="<connection string>" dotnet run --project src/Aurora.
 
 ## Rodando a API localmente
 
-1. Crie o banco e aplique os scripts de `database/` com o runner acima (ou na ordem `001` a `006`).
+1. Crie o banco e aplique os scripts de `database/` com o runner acima (ou na ordem `001` a `011`).
 2. Configure os segredos fora do repositório:
 
 ```bash
@@ -94,3 +105,14 @@ de desenvolvimento está em `appsettings.Development.json`).
 ## Decisões
 
 Registradas em [`docs/DECISOES.md`](docs/DECISOES.md).
+
+## App mobile
+
+```bash
+cd mobile/aurora_mobile
+npm install
+npm run check                     # tipos, ESLint e testes
+npx expo start --android          # emulador Android ou Expo Go
+```
+
+A URL da API vem de `EXPO_PUBLIC_API_BASE_URL`. Detalhes e perfis em [`mobile/aurora_mobile/README.md`](mobile/aurora_mobile/README.md).

@@ -20,6 +20,7 @@
 | `11-negocio-e-viabilidade.md` | Caracterização, Canvas, SWOT, viabilidade, responsabilidade social | **1, 2, 3** |
 | `12-inovacao-ia-3d-ar.md` | Extensão opcional: site público, 3D/AR, orçamento por foto (IA) | 4, 5, 8 (inovação) |
 | `13-matriz-de-requisitos.md` | Rastreabilidade: cada requisito ligado ao código e aos testes | todas |
+| `14-regras-relatorio.md` | Regras do relatório (ABNT e manual UNIP) | documento |
 | `DECISOES.md` | Registro de decisões, interpretações e desvios da especificação | - |
 
 ## Estado do projeto
