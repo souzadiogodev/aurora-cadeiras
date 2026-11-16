@@ -1,6 +1,6 @@
 # Build com o contexto na raiz do repositório: docker build -f docker/Dockerfile.api .
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build
 WORKDIR /repo
 COPY Directory.Build.props .editorconfig ./
 COPY src/ src/
