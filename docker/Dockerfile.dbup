@@ -1,6 +1,6 @@
 # Runner de scripts do banco (DbUp). Contexto na raiz: docker build -f docker/Dockerfile.dbup .
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build
 WORKDIR /repo
 COPY Directory.Build.props .editorconfig ./
 COPY src/Aurora.DbUp/ src/Aurora.DbUp/
