@@ -29,6 +29,8 @@ A URL da API vem de `EXPO_PUBLIC_API_BASE_URL` (definida em tempo de build). Sem
 ```bash
 # aparelho físico na mesma rede (troque pelo IP da sua máquina)
 EXPO_PUBLIC_API_BASE_URL=http://192.168.0.10:5011/api/v1 npx expo start
+# API pelo Docker Compose (porta 8080), no emulador Android
+EXPO_PUBLIC_API_BASE_URL=http://10.0.2.2:8080/api/v1 npx expo start --android
 # produção: sempre HTTPS
 EXPO_PUBLIC_API_BASE_URL=https://api.exemplo.com/api/v1 npx expo start
 ```
