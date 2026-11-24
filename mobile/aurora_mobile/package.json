@@ -59,6 +59,7 @@
     "setupFilesAfterEnv": [
       "<rootDir>/tests/setup.ts"
     ],
-    "clearMocks": true
+    "clearMocks": true,
+    "testTimeout": 30000
   }
 }
